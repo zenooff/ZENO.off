@@ -26,7 +26,6 @@
             position: fixed;
             width: 100%;
             height: 100%;
-            background: transparent;
             z-index: 0;
         }
 
@@ -48,21 +47,22 @@
         .container {
             z-index: 1;
             text-align: center;
+            width: 320px;
         }
 
         h1 {
-            font-size: 80px;
+            font-size: 70px;
             letter-spacing: 10px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         button {
             background: transparent;
             border: 2px solid white;
             color: white;
-            padding: 12px 30px;
-            margin: 10px;
-            font-size: 16px;
+            padding: 10px 20px;
+            margin: 8px;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.3s;
         }
@@ -71,42 +71,116 @@
             background: white;
             color: black;
         }
+
+        .form {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .form input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: black;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .form button {
+            width: 100%;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Étoiles -->
-    <div class="stars" id="stars"></div>
+<div class="stars" id="stars"></div>
 
-    <!-- Contenu -->
-    <div class="container">
-        <h1>ZENO</h1>
-        <button onclick="createAccount()">Créer un compte</button>
-        <button onclick="login()">Se connecter</button>
+<div class="container">
+    <h1>ZENO</h1>
+
+    <div id="main-buttons">
+        <button onclick="showRegister()">Créer un compte</button>
+        <button onclick="showLogin()">Se connecter</button>
     </div>
 
-    <script>
-        // Génération des étoiles violettes
-        const starsContainer = document.getElementById("stars");
+    <!-- INSCRIPTION -->
+    <div class="form" id="register-form">
+        <h3>Inscription</h3>
+        <input type="text" id="reg-username" placeholder="Pseudo">
+        <input type="email" id="reg-email" placeholder="Email">
+        <input type="password" id="reg-password" placeholder="Mot de passe">
+        <button onclick="register()">Valider</button>
+        <button onclick="back()">Retour</button>
+    </div>
 
-        for (let i = 0; i < 150; i++) {
-            const star = document.createElement("div");
-            star.className = "star";
-            star.style.top = Math.random() * 100 + "%";
-            star.style.left = Math.random() * 100 + "%";
-            star.style.animationDelay = Math.random() * 3 + "s";
-            starsContainer.appendChild(star);
+    <!-- CONNEXION -->
+    <div class="form" id="login-form">
+        <h3>Connexion</h3>
+        <input type="email" id="login-email" placeholder="Email">
+        <input type="password" id="login-password" placeholder="Mot de passe">
+        <button onclick="login()">Se connecter</button>
+        <button onclick="back()">Retour</button>
+    </div>
+</div>
+
+<script>
+    // Étoiles
+    const starsContainer = document.getElementById("stars");
+    for (let i = 0; i < 150; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.top = Math.random() * 100 + "%";
+        star.style.left = Math.random() * 100 + "%";
+        star.style.animationDelay = Math.random() * 3 + "s";
+        starsContainer.appendChild(star);
+    }
+
+    function showRegister() {
+        document.getElementById("main-buttons").style.display = "none";
+        document.getElementById("register-form").style.display = "block";
+    }
+
+    function showLogin() {
+        document.getElementById("main-buttons").style.display = "none";
+        document.getElementById("login-form").style.display = "block";
+    }
+
+    function back() {
+        document.getElementById("register-form").style.display = "none";
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("main-buttons").style.display = "block";
+    }
+
+    function register() {
+        const username = document.getElementById("reg-username").value;
+        const email = document.getElementById("reg-email").value;
+        const password = document.getElementById("reg-password").value;
+
+        if (!username || !email || !password) {
+            alert("Veuillez remplir tous les champs");
+            return;
         }
 
-        function createAccount() {
-            alert("Création de compte (à connecter à un backend plus tard)");
+        localStorage.setItem("zenoUser", JSON.stringify({ username, email, password }));
+        alert("Compte créé avec succès !");
+        back();
+    }
+
+    function login() {
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+
+        const user = JSON.parse(localStorage.getItem("zenoUser"));
+
+        if (!user || user.email !== email || user.password !== password) {
+            alert("Identifiants incorrects");
+            return;
         }
 
-        function login() {
-            alert("Connexion (après création du compte)");
-        }
-    </script>
+        alert("Connexion réussie ! Bienvenue " + user.username);
+    }
+</script>
 
 </body>
 </html>
-
