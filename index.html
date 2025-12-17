@@ -1,208 +1,112 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>ZENO</title>
+    <meta charset="UTF-8">
+    <title>ZENO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-<style>
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    background: black;
-    font-family: Arial, sans-serif;
-}
+        body {
+            background: black;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
 
-/* Canvas étoiles */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-}
+        /* Étoiles */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 0;
+        }
 
-/* Titre */
-.zeno {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 120px;
-    letter-spacing: 10px;
-    text-shadow:
-        0 0 10px white,
-        0 0 20px white,
-        0 0 40px white;
-    user-select: none;
-}
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: purple;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
 
-/* Boutons en haut à droite */
-.top-right {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 15px;
-}
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
 
-.btn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    padding: 10px 18px;
-    font-size: 14px;
-    cursor: pointer;
-    text-shadow: 0 0 10px white;
-    box-shadow: 0 0 10px white;
-}
+        /* Contenu */
+        .container {
+            z-index: 1;
+            text-align: center;
+        }
 
-.btn:hover {
-    box-shadow: 0 0 20px white;
-}
+        h1 {
+            font-size: 80px;
+            letter-spacing: 10px;
+            margin-bottom: 40px;
+        }
 
-/* Modales */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
+        button {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-.modal-content {
-    border: 2px solid white;
-    padding: 30px;
-    box-shadow: 0 0 30px white;
-}
-
-.modal-content h2 {
-    color: white;
-    text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px white;
-}
-
-.modal-content input {
-    width: 100%;
-    margin-bottom: 15px;
-    padding: 8px;
-    background: black;
-    border: 1px solid white;
-    color: white;
-}
-
-.modal-content button {
-    width: 100%;
-}
-</style>
+        button:hover {
+            background: white;
+            color: black;
+        }
+    </style>
 </head>
-
 <body>
 
-<canvas id="stars"></canvas>
+    <!-- Étoiles -->
+    <div class="stars" id="stars"></div>
 
-<div class="top-right">
-    <button class="btn" onclick="openModal('register')">Créer un compte</button>
-    <button class="btn" onclick="openModal('login')">Se connecter</button>
-</div>
-
-<div class="zeno">ZENO</div>
-
-<!-- Modal inscription -->
-<div class="modal" id="register">
-    <div class="modal-content">
-        <h2>Créer un compte</h2>
-        <input type="text" id="regUser" placeholder="Nom d'utilisateur">
-        <input type="password" id="regPass" placeholder="Mot de passe">
-        <button class="btn" onclick="register()">Valider</button>
+    <!-- Contenu -->
+    <div class="container">
+        <h1>ZENO</h1>
+        <button onclick="createAccount()">Créer un compte</button>
+        <button onclick="login()">Se connecter</button>
     </div>
-</div>
 
-<!-- Modal connexion -->
-<div class="modal" id="login">
-    <div class="modal-content">
-        <h2>Connexion</h2>
-        <input type="text" id="logUser" placeholder="Nom d'utilisateur">
-        <input type="password" id="logPass" placeholder="Mot de passe">
-        <button class="btn" onclick="login()">Se connecter</button>
-    </div>
-</div>
+    <script>
+        // Génération des étoiles violettes
+        const starsContainer = document.getElementById("stars");
 
-<script>
-// ÉTOILES
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const stars = [];
-for (let i = 0; i < 200; i++) {
-    stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.5 + 0.5,
-        s: Math.random() * 0.3 + 0.1
-    });
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "violet";
-
-    for (let star of stars) {
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        star.y += star.s;
-        if (star.y > canvas.height) {
-            star.y = 0;
-            star.x = Math.random() * canvas.width;
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            star.style.top = Math.random() * 100 + "%";
+            star.style.left = Math.random() * 100 + "%";
+            star.style.animationDelay = Math.random() * 3 + "s";
+            starsContainer.appendChild(star);
         }
-    }
-    requestAnimationFrame(animate);
-}
-animate();
 
-// MODALES
-function openModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
+        function createAccount() {
+            alert("Création de compte (à connecter à un backend plus tard)");
+        }
 
-window.onclick = e => {
-    document.querySelectorAll(".modal").forEach(m => {
-        if (e.target === m) m.style.display = "none";
-    });
-};
-
-// AUTH (localStorage)
-function register() {
-    const u = regUser.value;
-    const p = regPass.value;
-    if (!u || !p) return alert("Champs requis");
-    localStorage.setItem(u, p);
-    alert("Compte créé");
-    document.getElementById("register").style.display = "none";
-}
-
-function login() {
-    const u = logUser.value;
-    const p = logPass.value;
-    if (localStorage.getItem(u) === p) {
-        alert("Connexion réussie");
-        document.getElementById("login").style.display = "none";
-    } else {
-        alert("Identifiants incorrects");
-    }
-}
-</script>
+        function login() {
+            alert("Connexion (après création du compte)");
+        }
+    </script>
 
 </body>
 </html>
+
